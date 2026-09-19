@@ -1,30 +1,18 @@
 
 from flask import request
+import packages,json
 
-packages = [
-    {"id": 1,
-    "sender": "A",
-    "recipient": "B",
-    },
-    { 
-    "id": 3,
-    "sender": "C",
-    "recipient": "D",
-    },
-    {
-    "id": 2,
-    "sender": "E",
-    "recipient": "F",
-    }
-]
+#request-handling functions
 
 
+with open("packages.json","r") as file:
+    packages = json.load(file) #deserilization loading the file to python
 
 
 def view_packages():
-    return packages
+    return packages #works
 
-def get_package(id):
+def get_package(id): #works
     for p in packages:
         if p["id"] == id:
             return p
@@ -44,6 +32,8 @@ def create_package():
             "recipient" : recipient
         }
         packages.append(package)
+        with open("packages.json", "w") as file:
+            json.dump(packages,file)
         return {
             "message": "package created",
             "package": package
@@ -64,6 +54,8 @@ def update_package(id):
                 if recipient:
                     p["recipient"] =  recipient
                 
+                with open("packages.json", "w") as file:
+                    json.dump(packages,file)                
                 return {
                 "message" : "updated packaged",
                 "package" : p} 
@@ -76,6 +68,8 @@ def delete_package(id):
     for p in packages:
         if p["id"] == id:
             packages.remove(p)
+            with open("packages.json", "w") as file:
+                json.dump(packages,file)
             return {
             "message": "package removed",
             "removed package": p
