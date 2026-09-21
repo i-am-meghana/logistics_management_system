@@ -1,13 +1,35 @@
 
 from flask import request
-import packages,json
+from pathlib import Path
+import json
 
-#request-handling functions
+
+#request-handling functions     
 
 
-with open("packages.json","r") as file:
-    packages = json.load(file) #deserilization loading the file to python
+def file_handling():
+    print("FILE HANDLING CALLED")
 
+    if not Path("packages.json").exists():
+        with open("packages.json", "x") as file:
+            json.dump([], file) #create the file
+
+    try:#after creating try to read it
+        with open("packages.json", "r") as file:
+            packages = json.load(file)
+            return packages
+
+    except json.JSONDecodeError:
+        raise RuntimeError("packages.json contains invalid JSON")
+
+
+
+
+
+
+
+packages = file_handling()
+        
 
 def view_packages():
     return packages #works
@@ -25,7 +47,7 @@ def create_package():
     if not sender or not recipient:
         return {"error": "sender and recipient required"}
     else:
-        new_id = max(item["id"] for item in packages)
+        new_id = max((item["id"] for item in packages), default=0) #ValueError: max() iterable argument is empty as in there currently theres no id so we default to 0 if there is none
         package = {
             "id" : new_id+1,
             "sender" : sender ,
